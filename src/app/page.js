@@ -27,6 +27,13 @@ export default function Home(props) {
     } else {
       NewErrors.Password = "wrong password";
     }
+    const comfirmPasswordRegex =
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+    if (comfirmPasswordRegex.test(from.comfirmPassword)) {
+      NewErrors.comfirmPassword = null;
+    } else {
+      NewErrors.comfirmPassword = "wrong comfirm password";
+    }
     setErrors(NewErrors);
     if (!NewErrors.email && !NewErrors.phone) {
       setStep("step2");
@@ -200,11 +207,11 @@ export default function Home(props) {
                     Password: e.target.value,
                   })
                 }
-                value={from.Password}
+                value={from.comfirmPassword}
                 className="w-[392px] h-[40px] flex p-[12px] items-center rounded-[8px] border-[#8B8E95] border-2 text-black"
               />{" "}
-              {!setErrors.Password && (
-                <div className="text-red-600">{errors.Password}</div>
+              {!setErrors.comfirmPassword && (
+                <div className="text-red-600">{errors.comfirmPassword}</div>
               )}
             </div>
           </header>
