@@ -1,41 +1,57 @@
 "use client";
-
-import { Basic } from "next/font/google";
-import { useState } from "react";
-
-export default function Home(props) {
+import { useEffect, useState } from "react";
+// import { motion, AnimatePresence } from "motion/react";
+export default function Home() {
   const [errors, setErrors] = useState({});
   const [preview, setPreview] = useState();
+  const [form, setForm] = useState({
+    firstname: "",
+    Lastname: "",
+    Username: "",
+    email: "",
+    phone: "",
+    Password: "",
+    comfirmPassword: "",
+  });
   function gotoNext() {
     console.log("next");
     const NewErrors = {};
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-    if (emailRegex.test(from.email)) {
+    if (emailRegex.test(form.email)) {
       NewErrors.email = null;
     } else {
       NewErrors.email = "wrong email";
     }
     const mnPhoneRegex = /^\d{8}$/;
-    if (mnPhoneRegex.test(from.phone)) {
+    if (mnPhoneRegex.test(form.phone)) {
       NewErrors.phone = null;
     } else {
       NewErrors.phone = "wrong number";
     }
     const PasswordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-    if (PasswordRegex.test(from.Password)) {
+    if (PasswordRegex.test(form.Password)) {
       NewErrors.Password = null;
     } else {
       NewErrors.Password = "wrong password";
     }
     const comfirmPasswordRegex =
       /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-    if (comfirmPasswordRegex.test(from.comfirmPassword)) {
+    if (comfirmPasswordRegex.test(form.comfirmPassword)) {
       NewErrors.comfirmPassword = null;
     } else {
       NewErrors.comfirmPassword = "wrong comfirm password";
     }
+    if (
+      (form.Password =
+        form.comfirmPassword && PasswordRegex.test(form.Password))
+    ) {
+      NewErrors.confirmPassword = null;
+    } else {
+      NewErrors.confirmPassword = "Password do not match. Please try again";
+    }
     setErrors(NewErrors);
     if (!NewErrors.email && !NewErrors.phone) {
+      localStorage.setItem("myForm", JSON.stringify(form));
       setStep("step2");
     }
   }
@@ -43,25 +59,27 @@ export default function Home(props) {
     const NewErrors2 = {};
 
     const UsernameRegex = /^[a-zA-Z0-9_-]{3,16}$/i;
-    if (UsernameRegex.test(from.Username)) {
+    if (UsernameRegex.test(form.Username)) {
       NewErrors2.Username = null;
     } else {
       NewErrors2.Username = "not username";
     }
     setErrors(NewErrors2);
     if (!NewErrors2.Username) {
+      localStorage.setItem("myForm", JSON.stringify(form));
       setStep("step1");
     }
   }
+  useEffect(() => {
+    const localForm = localStorage.getItem("myForm");
+    if (localForm) {
+      setForm(JSON.parse(localForm));
+    }
+  }, []);
 
   const [step, setStep] = useState("basic");
-  const [from, setForm] = useState({
-    firstname: "",
-    Lastname: "",
-    Username: "",
-  });
 
-  console.log({ step });
+  console.log({ form });
   function Continue3() {
     setStep("step3");
   }
@@ -70,7 +88,6 @@ export default function Home(props) {
     const file = e.target.files[0];
     const filePreview = URL.createObjectURL(file);
     setPreview(filePreview);
-    console.log(file);
   }
   if (step === "basic") {
     return (
@@ -89,10 +106,10 @@ export default function Home(props) {
               <h6 className="text-black">First name *</h6>
               <input
                 placeholder={"Placeholder"}
-                value={from.firstname}
+                value={form.firstname}
                 onChange={(e) =>
                   setForm({
-                    ...from,
+                    ...form,
                     firstname: e.target.value,
                   })
                 }
@@ -103,11 +120,11 @@ export default function Home(props) {
                 placeholder={"Placeholder"}
                 onChange={(e) =>
                   setForm({
-                    ...from,
+                    ...form,
                     Lastname: e.target.value,
                   })
                 }
-                value={from.Lastname}
+                value={form.Lastname}
                 className="w-[392px] h-[40px] flex p-[12px] items-center rounded-[8px] border-[#8B8E95] border-2 text-black"
               ></input>
               <h6 className="text-black">Username *</h6>
@@ -115,14 +132,14 @@ export default function Home(props) {
                 placeholder={"Placeholder"}
                 onChange={(e) =>
                   setForm({
-                    ...from,
+                    ...form,
                     Username: e.target.value,
                   })
                 }
-                value={from.Username}
+                value={form.Username}
                 className="w-[392px] h-[40px] flex p-[12px] items-center rounded-[8px] border-[#8B8E95] border-2 text-black"
               />
-              {errors.Username && (
+              {!setErrors.Username && (
                 <div className="text-red-600">{errors.Username}</div>
               )}
             </div>
@@ -154,10 +171,10 @@ export default function Home(props) {
               <h6 className="text-black">Email *</h6>
               <input
                 placeholder={"Placeholder"}
-                value={from.email}
+                value={form.email}
                 onChange={(e) =>
                   setForm({
-                    ...from,
+                    ...form,
                     email: e.target.value,
                   })
                 }
@@ -171,11 +188,11 @@ export default function Home(props) {
                 placeholder={"Placeholder"}
                 onChange={(e) =>
                   setForm({
-                    ...from,
+                    ...form,
                     phone: e.target.value,
                   })
                 }
-                value={from.phone}
+                value={form.phone}
                 className="w-[392px] h-[40px] flex p-[12px] items-center rounded-[8px] border-[#8B8E95] border-2 text-black"
               />
               {!setErrors.phone && (
@@ -183,15 +200,15 @@ export default function Home(props) {
               )}
               <h6 className="text-black">Password *</h6>
               <input
-                type="password"
+                type="text"
                 placeholder={"Placeholder"}
                 onChange={(e) =>
                   setForm({
-                    ...from,
+                    ...form,
                     Password: e.target.value,
                   })
                 }
-                value={from.Password}
+                value={form.Password}
                 className="w-[392px] h-[40px] flex p-[12px] items-center rounded-[8px] border-[#8B8E95] border-2 text-black"
               />
               {!setErrors.Password && (
@@ -203,11 +220,11 @@ export default function Home(props) {
                 placeholder={"Placeholder"}
                 onChange={(e) =>
                   setForm({
-                    ...from,
-                    Password: e.target.value,
+                    ...form,
+                    comfirmPassword: e.target.value,
                   })
                 }
-                value={from.comfirmPassword}
+                value={form.comfirmPassword}
                 className="w-[392px] h-[40px] flex p-[12px] items-center rounded-[8px] border-[#8B8E95] border-2 text-black"
               />{" "}
               {!setErrors.comfirmPassword && (
@@ -253,14 +270,14 @@ export default function Home(props) {
               <input
                 type="date"
                 placeholder={"--/--/--"}
-                value={from.date}
+                value={form.date}
                 onChange={(e) =>
                   setForm({
-                    ...from,
+                    ...form,
                     date: e.target.value,
                   })
                 }
-                className="w-[392px] h-[40px] flex p-[12px] items-center rounded-[8px] border-[#8B8E95] border-2 text-black"
+                className="w-[392px] h-[40px] p-[12px] items-center rounded-[8px] border-[#8B8E95] border-2 text-black"
               ></input>
             </div>
             <h6 className="text-black mt-3">Profile image *</h6>
